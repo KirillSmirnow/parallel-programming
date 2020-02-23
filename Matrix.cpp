@@ -1,6 +1,5 @@
 #include <iostream>
 #include <fstream>
-#include <tuple>
 #include "Utils.cpp"
 
 using namespace std;
@@ -67,6 +66,7 @@ void generateAndPersistMatrices(int matrix_size_limit) {
     Matrix(b, c).writeToFile("B.matrix");
 }
 
-tuple<Matrix, Matrix> fetchMatrices() {
-    return make_tuple(Matrix("A.matrix"), Matrix("B.matrix"));
+void fetchMatrices(Matrix **A, Matrix **B) {
+    *A = new Matrix("A.matrix");
+    *B = new Matrix("B.matrix");
 }
