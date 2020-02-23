@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <tuple>
+#include "Utils.cpp"
 
 using namespace std;
 
@@ -15,7 +16,7 @@ public:
         for (auto row = 0; row < rows; row++) {
             values[row] = new int[columns];
             for (auto column = 0; column < columns; column++) {
-                values[row][column] = 4;
+                values[row][column] = randomInt(-1000000, 1000000);
             }
         }
     }
@@ -56,8 +57,10 @@ public:
     }
 };
 
-void generateAndPersistMatrices() {
-    auto a = 3, b = 4, c = 5;
+void generateAndPersistMatrices(int matrix_size_limit) {
+    auto a = randomInt(1, matrix_size_limit);
+    auto b = randomInt(1, matrix_size_limit);
+    auto c = randomInt(1, matrix_size_limit);
     Matrix(a, b).writeToFile("A.matrix");
     Matrix(b, c).writeToFile("B.matrix");
 }

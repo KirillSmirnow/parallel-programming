@@ -3,7 +3,7 @@
 using namespace std;
 
 int main() {
-    generateAndPersistMatrices();
+    generateAndPersistMatrices(5);
     Matrix A(0, 0), B(0, 0);
     tie(A, B) = fetchMatrices();
     A.writeToStdout();
