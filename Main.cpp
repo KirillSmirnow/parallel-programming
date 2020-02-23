@@ -3,8 +3,9 @@
 using namespace std;
 
 int main() {
+    srandom(5);
     generateAndPersistMatrices(5);
-    Matrix A(0, 0), B(0, 0);
+    Matrix A, B;
     tie(A, B) = fetchMatrices();
     A.writeToStdout();
     B.writeToStdout();

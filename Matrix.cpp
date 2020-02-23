@@ -11,6 +11,8 @@ public:
     int columns;
     int **values;
 
+    Matrix() : Matrix(0, 0) {}
+
     Matrix(int rows, int columns) : rows(rows), columns(columns) {
         values = new int *[rows];
         for (auto row = 0; row < rows; row++) {
