@@ -13,9 +13,12 @@ void executeMultiplication(int mode) {
 
     Multiplication *multiplication;
     switch (mode) {
+        default:
+            multiplication = new SerialMultiplication(A, B);
     }
 
-    multiplication->execute();
+    auto result = multiplication->execute();
+    result->writeToFile("C.matrix");
 }
 
 int main(int argc, char **argv) {

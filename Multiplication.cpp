@@ -18,4 +18,29 @@ public:
         }
         return result;
     }
+
+    Matrix *toMatrix(int **values) {
+        auto matrix = new Matrix();
+        matrix->rows = A->rows;
+        matrix->columns = B->columns;
+        matrix->values = values;
+        return matrix;
+    }
+};
+
+class SerialMultiplication : public Multiplication {
+public:
+    SerialMultiplication(Matrix *a, Matrix *b) : Multiplication(a, b) {}
+
+    Matrix *execute() override {
+        int rows = A->rows;
+        int columns = B->columns;
+        int **result = new int *[rows];
+        for (int row = 0; row < rows; row++) {
+            for (int column = 0; column < columns; column++) {
+                result[row][column] = computeElement(row, column);
+            }
+        }
+        return toMatrix(result);
+    }
 };
