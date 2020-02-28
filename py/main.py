@@ -21,7 +21,7 @@ matrix_sizes = (
 )
 
 benchmarks = {
-    mode: {size: -1 for size in matrix_sizes}
+    mode: {(size[0] * size[1]): -1 for size in matrix_sizes}
     for mode in calculation_modes
 }
 
