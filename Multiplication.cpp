@@ -37,6 +37,7 @@ public:
         int columns = B->columns;
         int **result = new int *[rows];
         for (int row = 0; row < rows; row++) {
+            result[row] = new int[columns];
             for (int column = 0; column < columns; column++) {
                 result[row][column] = computeElement(row, column);
             }
