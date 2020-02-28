@@ -1,3 +1,4 @@
+import time
 import subprocess
 
 EXECUTABLE = "../cpp/cmake-build-debug/open_mp"
@@ -33,8 +34,13 @@ def benchmark_matrix(height, width):
 
 def benchmark_matrix_mode(mode):
     print("Benchmarking mode %d" % mode)
-    for i in range(100):
+    iterations = 100
+    start = time.time()
+    for i in range(iterations):
         subprocess.call([EXECUTABLE, "2", str(mode)])
+    finish = time.time()
+    duration = (finish - start) / 100
+    print("Duration: %.2f seconds" % duration)
 
 
 if __name__ == '__main__':
