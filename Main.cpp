@@ -4,7 +4,7 @@
 using namespace std;
 
 void generateMatrices(int height, int width) {
-    generateAndPersistMatrices(5);
+    generateAndPersistMatrices(height, width);
 }
 
 void executeMultiplication(int mode) {

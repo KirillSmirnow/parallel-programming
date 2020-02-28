@@ -19,7 +19,7 @@ public:
         for (auto row = 0; row < rows; row++) {
             values[row] = new int[columns];
             for (auto column = 0; column < columns; column++) {
-                values[row][column] = randomInt(-1000000, 1000000);
+                values[row][column] = randomInt(-1000, 1000);
             }
         }
     }
@@ -60,12 +60,10 @@ public:
     }
 };
 
-void generateAndPersistMatrices(int matrix_size_limit) {
-    auto a = randomInt(1, matrix_size_limit);
-    auto b = randomInt(1, matrix_size_limit);
-    auto c = randomInt(1, matrix_size_limit);
-    Matrix(a, b).writeToFile("A.matrix");
-    Matrix(b, c).writeToFile("B.matrix");
+void generateAndPersistMatrices(int height, int width) {
+    auto b = randomInt(1, 1000);
+    Matrix(height, b).writeToFile("A.matrix");
+    Matrix(b, width).writeToFile("B.matrix");
 }
 
 void fetchMatrices(Matrix **A, Matrix **B) {
