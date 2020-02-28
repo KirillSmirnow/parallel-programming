@@ -1,5 +1,6 @@
 import time
 import subprocess
+import matplotlib
 
 EXECUTABLE = "../cpp/cmake-build-debug/open_mp"
 
