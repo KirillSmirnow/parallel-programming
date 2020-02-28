@@ -4,10 +4,10 @@ import matplotlib.pyplot as plot
 
 EXECUTABLE = "../cpp/cmake-build-debug/open_mp"
 
-calculation_modes = (
-    0,  # serial
-    1,  # parallel I
-)
+calculation_modes = {
+    0: "Serial",
+    1: "Parallel I",
+}
 
 matrix_sizes = (
     (1, 1),
@@ -57,7 +57,7 @@ def plot_results():
         sizes = tuple(benchmarks[mode].keys())
         durations = tuple(benchmarks[mode].values())
         plot.plot(sizes, durations)
-    plot.legend(benchmarks.keys())
+    plot.legend(calculation_modes.values())
     plot.show()
 
 
