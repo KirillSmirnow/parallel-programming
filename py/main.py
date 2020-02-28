@@ -52,6 +52,16 @@ def benchmark_matrix_mode(mode) -> float:
     return duration
 
 
+def plot_results():
+    for mode in benchmarks:
+        sizes = tuple(benchmarks[mode].keys())
+        durations = tuple(benchmarks[mode].values())
+        plot.plot(sizes, durations)
+    plot.legend(benchmarks.keys())
+    plot.show()
+
+
 if __name__ == '__main__':
     benchmark()
     print("Results", benchmarks)
+    plot_results()
