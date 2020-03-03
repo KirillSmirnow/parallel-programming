@@ -45,3 +45,24 @@ public:
         return toMatrix(result);
     }
 };
+
+class ParallelForMultiplication : public Multiplication {
+public:
+    ParallelForMultiplication(Matrix *a, Matrix *b) : Multiplication(a, b) {}
+
+    Matrix *execute() override {
+        int rows = A->rows;
+        int columns = B->columns;
+        int **result = new int *[rows];
+
+#pragma omp parallel for
+        for (int row = 0; row < rows; row++) {
+            result[row] = new int[columns];
+            for (int column = 0; column < columns; column++) {
+                result[row][column] = computeElement(row, column);
+            }
+        }
+
+        return toMatrix(result);
+    }
+};
