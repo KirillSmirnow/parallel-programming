@@ -56,7 +56,7 @@ def plot_results():
     for mode in benchmarks:
         sizes = tuple(benchmarks[mode].keys())
         durations = tuple(benchmarks[mode].values())
-        plot.plot(sizes, durations)
+        plot.plot(sizes, durations, marker='o')
     plot.legend(calculation_modes.values())
     plot.show()
 
