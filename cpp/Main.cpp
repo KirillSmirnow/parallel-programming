@@ -25,7 +25,7 @@ void executeMultiplication(int mode) {
 }
 
 int main(int argc, char **argv) {
-    srandom(5);
+    srandom(time(nullptr));
     if (argc < 2) {
         return 1;
     }
