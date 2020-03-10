@@ -61,7 +61,7 @@ public:
 };
 
 void generateAndPersistMatrices(int height, int width) {
-    auto b = randomInt(1, 1000);
+    auto b = 500;
     Matrix(height, b).writeToFile("A.matrix");
     Matrix(b, width).writeToFile("B.matrix");
 }
