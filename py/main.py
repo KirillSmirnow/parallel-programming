@@ -53,10 +53,12 @@ def benchmark_matrix_mode(mode) -> float:
 
 
 def plot_results():
+    serial_durations = tuple(benchmarks[0].values())  # 0 - serial mode
     for mode in benchmarks:
         sizes = tuple(benchmarks[mode].keys())
         durations = tuple(benchmarks[mode].values())
-        plot.plot(sizes, durations, marker='o')
+        accelerations = tuple(sd / d for sd, d in zip(serial_durations, durations))
+        plot.plot(sizes, accelerations, marker='o')
     plot.legend(calculation_modes.values())
     plot.show()
 
