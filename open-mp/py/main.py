@@ -1,4 +1,3 @@
-import time
 import subprocess
 import matplotlib.pyplot as plot
 
@@ -11,11 +10,11 @@ calculation_modes = {
 }
 
 matrix_sizes = (
-    (100, 10),
-    (50, 200),
     (250, 250),
     (500, 500),
+    (600, 800),
     (1523, 449),
+    (900, 950),
     (1000, 1000),
     (1, 1_000_000),
     (1_000_000, 1),
@@ -43,12 +42,11 @@ def benchmark_matrix(height, width):
 def benchmark_matrix_mode(height, width, mode) -> float:
     print("Benchmarking mode %d" % mode)
     iterations = 100
-    start = time.time()
+    iterations_time = 0
     for i in range(iterations):
-        code = subprocess.call([EXECUTABLE, str(height), str(width), str(mode)])
-        assert code == 0
-    finish = time.time()
-    duration = (finish - start) / 100
+        process = subprocess.Popen([EXECUTABLE, str(height), str(width), str(mode)], stdout=subprocess.PIPE)
+        iterations_time += float(process.stdout.readline())
+    duration = iterations_time / iterations
     print("Duration: %.2f seconds" % duration)
     return duration
 

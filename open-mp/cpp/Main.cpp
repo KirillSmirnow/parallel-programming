@@ -1,7 +1,9 @@
+#include <chrono>
 #include "Matrix.cpp"
 #include "Multiplication.cpp"
 
 using namespace std;
+using namespace std::chrono;
 
 void executeMultiplication(int rows, int columns, int mode) {
     auto b = 500;
@@ -20,7 +22,10 @@ void executeMultiplication(int rows, int columns, int mode) {
             multiplication = new SerialMultiplication(A, B);
     }
 
+    auto start = high_resolution_clock::now();
     multiplication->execute();
+    auto finish = high_resolution_clock::now();
+    cout << duration<double>(finish - start).count() << endl;
 }
 
 int main(int argc, char **argv) {
