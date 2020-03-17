@@ -66,3 +66,29 @@ public:
         return toMatrix(result);
     }
 };
+
+class ParallelTasksMultiplication : public Multiplication {
+public:
+    ParallelTasksMultiplication(Matrix *a, Matrix *b) : Multiplication(a, b) {}
+
+    Matrix *execute() override {
+        int rows = A->rows;
+        int columns = B->columns;
+
+        int **result = new int *[rows];
+#pragma omp parallel for
+        for (int row = 0; row < rows; row++) {
+            result[row] = new int[columns];
+        }
+
+        int tasks = rows * columns;
+#pragma omp parallel for
+        for (int task = 0; task < tasks; task++) {
+            int row = task / columns;
+            int column = task % columns;
+            result[row][column] = computeElement(row, column);
+        }
+
+        return toMatrix(result);
+    }
+};

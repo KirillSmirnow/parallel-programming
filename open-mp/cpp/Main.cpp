@@ -16,6 +16,9 @@ void executeMultiplication(int mode) {
         case 1:
             multiplication = new ParallelForMultiplication(A, B);
             break;
+        case 2:
+            multiplication = new ParallelTasksMultiplication(A, B);
+            break;
         default:
             multiplication = new SerialMultiplication(A, B);
     }

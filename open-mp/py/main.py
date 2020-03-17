@@ -7,6 +7,7 @@ EXECUTABLE = "../cpp/cmake-build-debug/open_mp"
 calculation_modes = {
     0: "Serial",
     1: "Parallel For",
+    2: "Parallel Tasks",
 }
 
 matrix_sizes = (
