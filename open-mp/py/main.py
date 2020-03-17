@@ -11,20 +11,17 @@ calculation_modes = {
 }
 
 matrix_sizes = (
-    (1, 1),
-    (10, 10),
-    (100, 100),
-    (1, 25000),
-    (25000, 1),
-    (200, 200),
-    (400, 400),
-    (600, 600),
-    (800, 800),
-    (1000, 1000),
+    (100, 10),
+    (50, 200),
+    (250, 250),
+    (500, 500),
+    (1523, 449),
+    (1, 1_000_000),
+    (1_000_000, 1),
 )
 
 benchmarks = {
-    mode: {(size[0] * size[1]): -1 for size in matrix_sizes}
+    mode: {size: -1 for size in matrix_sizes}
     for mode in calculation_modes
 }
 
@@ -35,8 +32,8 @@ def benchmark():
 
 
 def benchmark_matrix(height, width):
-    print("Benchmarking matrix of size %d×%d" % (height, width))
-    size = height * width
+    print(f"Benchmarking matrix of size {height}×{width}")
+    size = height, width
     for mode in calculation_modes:
         duration = benchmark_matrix_mode(height, width, mode)
         benchmarks[mode][size] = duration
@@ -58,10 +55,9 @@ def benchmark_matrix_mode(height, width, mode) -> float:
 def plot_results():
     serial_durations = tuple(benchmarks[0].values())  # 0 - serial mode
     for mode in benchmarks:
-        sizes = tuple(benchmarks[mode].keys())
         durations = tuple(benchmarks[mode].values())
         accelerations = tuple(sd / d for sd, d in zip(serial_durations, durations))
-        plot.plot(sizes, accelerations, marker='o')
+        plot.plot(accelerations, marker='o')
     plot.legend(calculation_modes.values())
     plot.show()
 
