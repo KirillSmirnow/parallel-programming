@@ -37,18 +37,18 @@ def benchmark():
 def benchmark_matrix(height, width):
     print("Benchmarking matrix of size %d×%d" % (height, width))
     size = height * width
-    subprocess.call([EXECUTABLE, "1", str(height), str(width)])
     for mode in calculation_modes:
-        duration = benchmark_matrix_mode(mode)
+        duration = benchmark_matrix_mode(height, width, mode)
         benchmarks[mode][size] = duration
 
 
-def benchmark_matrix_mode(mode) -> float:
+def benchmark_matrix_mode(height, width, mode) -> float:
     print("Benchmarking mode %d" % mode)
     iterations = 100
     start = time.time()
     for i in range(iterations):
-        subprocess.call([EXECUTABLE, "2", str(mode)])
+        code = subprocess.call([EXECUTABLE, str(height), str(width), str(mode)])
+        assert code == 0
     finish = time.time()
     duration = (finish - start) / 100
     print("Duration: %.2f seconds" % duration)
