@@ -2,7 +2,7 @@ import time
 import subprocess
 import matplotlib.pyplot as plot
 
-EXECUTABLE = "../cpp/cmake-build-debug/open_mp"
+EXECUTABLE = "../cpp/cmake-build-release/open_mp"
 
 calculation_modes = {
     0: "Serial",
@@ -16,6 +16,7 @@ matrix_sizes = (
     (250, 250),
     (500, 500),
     (1523, 449),
+    (1000, 1000),
     (1, 1_000_000),
     (1_000_000, 1),
 )
