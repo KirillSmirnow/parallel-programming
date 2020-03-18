@@ -5,8 +5,10 @@ EXECUTABLE = "../cpp/cmake-build-release/open_mp"
 
 calculation_modes = {
     0: "Serial",
-    1: "Parallel For",
-    2: "Parallel Tasks",
+    1: "Parallel For, Static Schedule",
+    2: "Parallel Tasks, Static Schedule",
+    3: "Parallel Tasks, Dynamic Schedule",
+    4: "Parallel Tasks, Guided Schedule",
 }
 
 matrix_sizes = (

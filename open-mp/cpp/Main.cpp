@@ -16,7 +16,13 @@ void executeMultiplication(int rows, int columns, int mode) {
             multiplication = new ParallelForMultiplication(A, B);
             break;
         case 2:
-            multiplication = new ParallelTasksMultiplication(A, B);
+            multiplication = new ParallelTasksStaticScheduleMultiplication(A, B);
+            break;
+        case 3:
+            multiplication = new ParallelTasksDynamicScheduleMultiplication(A, B);
+            break;
+        case 4:
+            multiplication = new ParallelTasksGuidedScheduleMultiplication(A, B);
             break;
         default:
             multiplication = new SerialMultiplication(A, B);

@@ -55,7 +55,7 @@ public:
         int columns = B->columns;
         int **result = new int *[rows];
 
-#pragma omp parallel for
+#pragma omp parallel for schedule(static)
         for (int row = 0; row < rows; row++) {
             result[row] = new int[columns];
             for (int column = 0; column < columns; column++) {
@@ -67,22 +67,74 @@ public:
     }
 };
 
-class ParallelTasksMultiplication : public Multiplication {
+class ParallelTasksStaticScheduleMultiplication : public Multiplication {
 public:
-    ParallelTasksMultiplication(Matrix *a, Matrix *b) : Multiplication(a, b) {}
+    ParallelTasksStaticScheduleMultiplication(Matrix *a, Matrix *b) : Multiplication(a, b) {}
 
     Matrix *execute() override {
         int rows = A->rows;
         int columns = B->columns;
 
         int **result = new int *[rows];
-#pragma omp parallel for
+#pragma omp parallel for schedule(static)
         for (int row = 0; row < rows; row++) {
             result[row] = new int[columns];
         }
 
         int tasks = rows * columns;
-#pragma omp parallel for
+#pragma omp parallel for schedule(static)
+        for (int task = 0; task < tasks; task++) {
+            int row = task / columns;
+            int column = task % columns;
+            result[row][column] = computeElement(row, column);
+        }
+
+        return toMatrix(result);
+    }
+};
+
+class ParallelTasksDynamicScheduleMultiplication : public Multiplication {
+public:
+    ParallelTasksDynamicScheduleMultiplication(Matrix *a, Matrix *b) : Multiplication(a, b) {}
+
+    Matrix *execute() override {
+        int rows = A->rows;
+        int columns = B->columns;
+
+        int **result = new int *[rows];
+#pragma omp parallel for schedule(static)
+        for (int row = 0; row < rows; row++) {
+            result[row] = new int[columns];
+        }
+
+        int tasks = rows * columns;
+#pragma omp parallel for schedule(dynamic, 1000)
+        for (int task = 0; task < tasks; task++) {
+            int row = task / columns;
+            int column = task % columns;
+            result[row][column] = computeElement(row, column);
+        }
+
+        return toMatrix(result);
+    }
+};
+
+class ParallelTasksGuidedScheduleMultiplication : public Multiplication {
+public:
+    ParallelTasksGuidedScheduleMultiplication(Matrix *a, Matrix *b) : Multiplication(a, b) {}
+
+    Matrix *execute() override {
+        int rows = A->rows;
+        int columns = B->columns;
+
+        int **result = new int *[rows];
+#pragma omp parallel for schedule(static)
+        for (int row = 0; row < rows; row++) {
+            result[row] = new int[columns];
+        }
+
+        int tasks = rows * columns;
+#pragma omp parallel for schedule(guided, 1000)
         for (int task = 0; task < tasks; task++) {
             int row = task / columns;
             int column = task % columns;
