@@ -13,7 +13,11 @@ int main() {
     MPI_Comm_size(MPI_COMM_WORLD, &totalProcesses);
 
     Quicksort quicksort(currentProcess, totalProcesses);
-    quicksort.initialize(readArray());
+    if (currentProcess == PRIMARY_PROCESS) {
+        quicksort.initialize(readArray());
+    } else {
+        quicksort.initialize(nullptr);
+    }
     while (true) {
         if (quicksort.group->size() == 1) {
             quicksort.sort();

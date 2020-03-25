@@ -6,10 +6,11 @@
 
 using namespace std;
 
+const int PRIMARY_PROCESS = 0;
+
 class Quicksort {
 private:
     const int MAX_ARRAY_SIZE = 1000000;
-    const int PRIMARY_PROCESS = 0;
     int currentProcess, totalProcesses;
 
     // MPI tags
@@ -61,7 +62,7 @@ public:
         }
 
         MPI_Status status;
-        MPI_Recv(&currentPivot, 1, MPI_INT, MPI_ANY_SOURCE, PIVOT, MPI_COMM_WORLD, &status);
+        MPI_Recv(&currentPivot, 1, MPI_INT, group->master(), PIVOT, MPI_COMM_WORLD, &status);
 
         log("New pivot: " + to_string(currentPivot));
     }
@@ -113,7 +114,7 @@ public:
 
         int *buffer = new int[2];
         MPI_Status status;
-        MPI_Recv(buffer, 2, MPI_INT, MPI_ANY_SOURCE, REGROUP, MPI_COMM_WORLD, &status);
+        MPI_Recv(buffer, 2, MPI_INT, group->master(), REGROUP, MPI_COMM_WORLD, &status);
         group = deserializeGroup(buffer);
 
         log("New group: " + group->toString());
