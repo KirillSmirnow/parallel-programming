@@ -16,22 +16,22 @@ public:
     }
 
     ProcessGroup *getLeftHalfGroup() {
-        return new ProcessGroup(first, size() / 2 - 1);
+        return new ProcessGroup(first, first + size() / 2 - 1);
     }
 
     ProcessGroup *getRightHalfGroup() {
-        return new ProcessGroup(size() / 2, last);
+        return new ProcessGroup(first + size() / 2, last);
     }
 
     bool isInLeftHalf(int process) {
-        return process < size() / 2;
+        return process - first < size() / 2;
     }
 
     int partnerFor(int process) {
         if (isInLeftHalf(process)) {
-            return process + size() / 2;
+            return (process - first + size() / 2) + first;
         }
-        return process - size() / 2;
+        return (process - first - size() / 2) + first;
     }
 
     string toString() {
