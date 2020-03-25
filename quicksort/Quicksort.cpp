@@ -19,6 +19,7 @@ private:
     const int REGROUP = 3;
     const int COLLECT = 4;
 
+    int currentPivot;
     IntArray *currentArray = nullptr;
 
 public:
@@ -51,6 +52,18 @@ public:
     }
 
     void pivot() {
+        if (currentProcess == group->master()) {
+            int pivot = currentArray->pivot();
+            MPI_Request request;
+            for (int process = 0; process < totalProcesses; process++) {
+                MPI_Isend(&pivot, 1, MPI_INT, process, PIVOT, MPI_COMM_WORLD, &request);
+            }
+        }
+
+        MPI_Status status;
+        MPI_Recv(&currentPivot, 1, MPI_INT, PRIMARY_PROCESS, PIVOT, MPI_COMM_WORLD, &status);
+
+        log("New pivot: " + to_string(currentPivot));
     }
 
     void exchange() {

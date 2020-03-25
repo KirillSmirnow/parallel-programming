@@ -16,6 +16,10 @@ public:
         }
     }
 
+    int pivot() {
+        return content[0];
+    }
+
     IntArray *getPart(int part, int totalParts) {
         int partSize = size / totalParts;
         int begin = part * partSize;
