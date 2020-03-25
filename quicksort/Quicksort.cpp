@@ -67,6 +67,34 @@ public:
     }
 
     void exchange() {
+        int partner = group->partnerFor(currentProcess);
+
+        IntArray *low, *high;
+        currentArray->hoarPartition(currentPivot, &low, &high);
+        log("Low = " + low->toString() + "; High = " + high->toString());
+
+        MPI_Request request;
+        if (group->isInLeftHalf(currentProcess)) {
+            MPI_Isend(high->content, high->size, MPI_INT, partner, EXCHANGE, MPI_COMM_WORLD, &request);
+        } else {
+            MPI_Isend(low->content, low->size, MPI_INT, partner, EXCHANGE, MPI_COMM_WORLD, &request);
+        }
+
+        MPI_Status status;
+        int *buffer = new int[MAX_ARRAY_SIZE];
+        MPI_Recv(buffer, MAX_ARRAY_SIZE, MPI_INT, partner, EXCHANGE, MPI_COMM_WORLD, &status);
+
+        int size;
+        MPI_Get_count(&status, MPI_INT, &size);
+        if (group->isInLeftHalf(currentProcess)) {
+            high = new IntArray(buffer, size);
+        } else {
+            low = new IntArray(buffer, size);
+        }
+
+        currentArray = new IntArray(low, high);
+
+        log("New array: " + currentArray->toString());
     }
 
     void regroup() {
