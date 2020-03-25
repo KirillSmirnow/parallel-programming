@@ -126,6 +126,28 @@ public:
     }
 
     void collect() {
+        MPI_Request req;
+        MPI_Isend(currentArray->content, currentArray->size, MPI_INT, PRIMARY_PROCESS, COLLECT, MPI_COMM_WORLD, &req);
+
+        if (currentProcess == PRIMARY_PROCESS) {
+            IntArray *result = nullptr;
+            for (int process = 0; process < totalProcesses; process++) {
+                MPI_Status status;
+                int *buffer = new int[MAX_ARRAY_SIZE];
+                MPI_Recv(buffer, MAX_ARRAY_SIZE, MPI_INT, process, COLLECT, MPI_COMM_WORLD, &status);
+
+                int size;
+                MPI_Get_count(&status, MPI_INT, &size);
+
+                auto *array = new IntArray(buffer, size);
+                if (result == nullptr) {
+                    result = array;
+                } else {
+                    result = new IntArray(result, array);
+                }
+            }
+            log("Result collected: " + result->toString());
+        }
     }
 
 private:
