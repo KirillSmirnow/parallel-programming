@@ -15,6 +15,14 @@ public:
         return last - first + 1;
     }
 
+    ProcessGroup *getLeftHalfGroup() {
+        return new ProcessGroup(first, size() / 2 - 1);
+    }
+
+    ProcessGroup *getRightHalfGroup() {
+        return new ProcessGroup(size() / 2, last);
+    }
+
     bool isInLeftHalf(int process) {
         return process < size() / 2;
     }
@@ -25,4 +33,16 @@ public:
         }
         return process - size() / 2;
     }
+
+    string toString() {
+        return "(" + to_string(first) + ", " + to_string(last) + ")";
+    }
 };
+
+int *serializeGroup(ProcessGroup *group) {
+    return new int[2]{group->first, group->last};
+}
+
+ProcessGroup *deserializeGroup(int *data) {
+    return new ProcessGroup(data[0], data[1]);
+}

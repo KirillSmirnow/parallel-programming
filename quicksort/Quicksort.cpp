@@ -61,7 +61,7 @@ public:
         }
 
         MPI_Status status;
-        MPI_Recv(&currentPivot, 1, MPI_INT, PRIMARY_PROCESS, PIVOT, MPI_COMM_WORLD, &status);
+        MPI_Recv(&currentPivot, 1, MPI_INT, MPI_ANY_SOURCE, PIVOT, MPI_COMM_WORLD, &status);
 
         log("New pivot: " + to_string(currentPivot));
     }
@@ -98,6 +98,25 @@ public:
     }
 
     void regroup() {
+        if (currentProcess == group->master()) {
+            MPI_Request request;
+            for (int process = 0; process < totalProcesses; process++) {
+                ProcessGroup *newGroup;
+                if (group->isInLeftHalf(process)) {
+                    newGroup = group->getLeftHalfGroup();
+                } else {
+                    newGroup = group->getRightHalfGroup();
+                }
+                MPI_Isend(serializeGroup(newGroup), 2, MPI_INT, process, REGROUP, MPI_COMM_WORLD, &request);
+            }
+        }
+
+        int *buffer = new int[2];
+        MPI_Status status;
+        MPI_Recv(buffer, 2, MPI_INT, MPI_ANY_SOURCE, REGROUP, MPI_COMM_WORLD, &status);
+        group = deserializeGroup(buffer);
+
+        log("New group: " + group->toString());
     }
 
     void sort() {
