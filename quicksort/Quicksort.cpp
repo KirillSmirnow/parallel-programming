@@ -125,7 +125,7 @@ public:
         log("Sorted: " + currentArray->toString());
     }
 
-    void collect() {
+    IntArray *collect() {
         MPI_Request req;
         MPI_Isend(currentArray->content, currentArray->size, MPI_INT, PRIMARY_PROCESS, COLLECT, MPI_COMM_WORLD, &req);
 
@@ -147,7 +147,10 @@ public:
                 }
             }
             log("Result collected: " + result->toString());
+            return result;
         }
+
+        return nullptr;
     }
 
 private:
