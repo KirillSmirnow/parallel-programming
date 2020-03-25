@@ -121,6 +121,8 @@ public:
     }
 
     void sort() {
+        qsort(currentArray->content, currentArray->size, sizeof(int), compareIntegers);
+        log("Sorted: " + currentArray->toString());
     }
 
     void collect() {
@@ -129,5 +131,11 @@ public:
 private:
     void log(const string &message) {
         cout << "#" << currentProcess << " - " << message << endl;
+    }
+
+    static int compareIntegers(const void *a, const void *b) {
+        int int1 = *((int *) a);
+        int int2 = *((int *) b);
+        return int1 - int2;
     }
 };
