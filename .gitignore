@@ -4,5 +4,6 @@ output/
 cmake-*/
 
 *.matrix
+*.log
 *.input
 *.output

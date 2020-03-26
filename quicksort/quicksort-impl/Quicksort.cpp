@@ -29,7 +29,7 @@ public:
     Quicksort(int currentProcess, int totalProcesses)
             : currentProcess(currentProcess), totalProcesses(totalProcesses) {
         group = new ProcessGroup(0, totalProcesses - 1);
-        cout << "Process " << currentProcess << ". Total processes: " << totalProcesses << endl;
+        log("Process " + to_string(currentProcess) + ". Total processes: " + to_string(totalProcesses));
     }
 
     void initialize(IntArray *array) {
@@ -155,7 +155,9 @@ public:
 
 private:
     void log(const string &message) {
-        cout << "#" << currentProcess << " - " << message << endl;
+        ofstream stream("qs." + to_string(currentProcess) + "-" + to_string(totalProcesses) + ".log", ios_base::app);
+        stream << time(nullptr) << " - " << message << endl;
+        stream.close();
     }
 
     static int compareIntegers(const void *a, const void *b) {
