@@ -27,6 +27,16 @@ def benchmark_array(array_length):
     for processes_count in processes_counts:
         duration = benchmark_array_with_processes_count(processes_count)
         benchmarks[processes_count][array_length] = duration
+        verify_array_sorted()
+
+
+def verify_array_sorted():
+    with open("quicksort.output") as file:
+        file.readline()
+        array = tuple(map(int, file.readline().strip().split(" ")))
+        for index in range(len(array) - 1):
+            if array[index] > array[index + 1]:
+                raise Exception("Array was not sorted")
 
 
 def benchmark_array_with_processes_count(processes_count) -> float:
