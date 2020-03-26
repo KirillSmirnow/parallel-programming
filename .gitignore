@@ -4,3 +4,5 @@ output/
 cmake-*/
 
 *.matrix
+*.input
+*.output
