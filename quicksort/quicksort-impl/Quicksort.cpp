@@ -56,7 +56,7 @@ public:
         if (currentProcess == group->master()) {
             int pivot = currentArray->pivot();
             MPI_Request request;
-            for (int process = 0; process < totalProcesses; process++) {
+            for (int process = group->first; process <= group->last; process++) {
                 MPI_Isend(&pivot, 1, MPI_INT, process, PIVOT, MPI_COMM_WORLD, &request);
             }
         }
@@ -101,7 +101,7 @@ public:
     void regroup() {
         if (currentProcess == group->master()) {
             MPI_Request request;
-            for (int process = 0; process < totalProcesses; process++) {
+            for (int process = group->first; process <= group->last; process++) {
                 ProcessGroup *newGroup;
                 if (group->isInLeftHalf(process)) {
                     newGroup = group->getLeftHalfGroup();
