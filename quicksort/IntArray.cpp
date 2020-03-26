@@ -18,11 +18,10 @@ public:
 
     IntArray(IntArray *low, IntArray *high) : size(low->size + high->size) {
         content = new int[size];
-        int i = 0;
-        for (i = 0; i < low->size; i++) {
+        for (int i = 0; i < low->size; i++) {
             content[i] = low->content[i];
         }
-        for (; i < size; i++) {
+        for (int i = low->size; i < size; i++) {
             content[i] = high->content[i - low->size];
         }
     }

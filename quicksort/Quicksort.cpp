@@ -20,7 +20,7 @@ private:
     const int REGROUP = 3;
     const int COLLECT = 4;
 
-    int currentPivot;
+    int currentPivot = 0;
     IntArray *currentArray = nullptr;
 
 public:
