@@ -27,7 +27,14 @@ public:
     }
 
     int pivot() {
-        return content[0];
+        int a = content[0], b = content[size / 2], c = content[size - 1];
+        if ((b <= a && a <= c) || (c <= a && a <= b)) {
+            return a;
+        }
+        if ((a <= b && b <= c) || (c <= b && b <= a)) {
+            return b;
+        }
+        return c;
     }
 
     void hoarPartition(int pivot, IntArray **low, IntArray **high) {

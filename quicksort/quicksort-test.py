@@ -58,7 +58,7 @@ def plot_results():
     for processes_count in benchmarks:
         durations = tuple(benchmarks[processes_count].values())
         accelerations = tuple(sd / d for sd, d in zip(serial_durations, durations))
-        plot.plot(accelerations, marker='o')
+        plot.plot(array_lengths, accelerations, marker='o')
     plot.legend(processes_counts)
     plot.show()
 
