@@ -7,3 +7,5 @@ cmake-*/
 *.log
 *.input
 *.output
+
+results*.csv

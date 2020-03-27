@@ -1,3 +1,4 @@
+import csv
 import time
 import random
 import subprocess
@@ -62,7 +63,21 @@ def plot_results():
     plot.show()
 
 
+def save_results():
+    records = []
+    for process_count in benchmarks:
+        for array_length in benchmarks[process_count]:
+            records.append((array_length, process_count, benchmarks[process_count][array_length]))
+    records.sort(key=lambda record: record[0])
+    with open("results.csv", "w") as file:
+        writer = csv.writer(file)
+        writer.writerow(["length", "processes", "time"])
+        for record in records:
+            writer.writerow(record)
+    print(records)
+
+
 if __name__ == '__main__':
     benchmark()
-    print("Results", benchmarks)
     plot_results()
+    save_results()
