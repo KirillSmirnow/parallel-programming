@@ -10,7 +10,7 @@ const int PRIMARY_PROCESS = 0;
 
 class Quicksort {
 private:
-    const int MAX_ARRAY_SIZE = 1000000;
+    const int MAX_ARRAY_SIZE = 10000000;
     int currentProcess, totalProcesses;
 
     // MPI tags

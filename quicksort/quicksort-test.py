@@ -7,7 +7,7 @@ import matplotlib.pyplot as plot
 EXECUTABLE = "./quicksort-impl/cmake-build-release/quicksort"
 
 processes_counts = (1, 2, 4)
-array_lengths = (1000, 10_000, 50_000, 100_000, 400_000, 700_000, 1_000_000)
+array_lengths = (10_000, 100_000, 500_000, 1_000_000, 3_000_000, 6_000_000, 10_000_000)
 
 benchmarks = {
     processes_count: {length: -1 for length in array_lengths}
