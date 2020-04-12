@@ -10,20 +10,16 @@ void writeArray(IntArray *array);
 
 int main() {
     MPI_Init(nullptr, nullptr);
-    int currentProcess, totalProcesses;
-    MPI_Comm_rank(MPI_COMM_WORLD, &currentProcess);
-    MPI_Comm_size(MPI_COMM_WORLD, &totalProcesses);
+    Quicksort quicksort;
 
-    Quicksort quicksort(currentProcess, totalProcesses);
-
-    if (currentProcess == PRIMARY_PROCESS) {
+    if (quicksort.globalGroup->currentProcess == PRIMARY_PROCESS) {
         quicksort.initialize(readArray());
     } else {
         quicksort.initialize(nullptr);
     }
 
     while (true) {
-        if (quicksort.group->size() == 1) {
+        if (quicksort.group->totalProcesses == 1) {
             quicksort.sort();
             break;
         }
@@ -32,7 +28,7 @@ int main() {
         quicksort.regroup();
     }
 
-    if (currentProcess == PRIMARY_PROCESS) {
+    if (quicksort.globalGroup->currentProcess == PRIMARY_PROCESS) {
         writeArray(quicksort.collect());
     } else {
         quicksort.collect();

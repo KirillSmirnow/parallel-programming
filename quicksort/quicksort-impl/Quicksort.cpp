@@ -7,43 +7,35 @@
 using namespace std;
 
 const int PRIMARY_PROCESS = 0;
+const int MAX_ARRAY_SIZE = 10000000;
 
 class Quicksort {
 private:
-    const int MAX_ARRAY_SIZE = 10000000;
-    int currentProcess, totalProcesses;
-
-    // MPI tags
-    const int INITIALIZE = 0;
-    const int PIVOT = 1;
-    const int EXCHANGE = 2;
-    const int REGROUP = 3;
-    const int COLLECT = 4;
-
     int currentPivot = 0;
     IntArray *currentArray = nullptr;
 
 public:
-    ProcessGroup *group = nullptr;
+    ProcessGroup *globalGroup;
+    ProcessGroup *group;
 
-    Quicksort(int currentProcess, int totalProcesses)
-            : currentProcess(currentProcess), totalProcesses(totalProcesses) {
-        group = new ProcessGroup(0, totalProcesses - 1);
-        log("Process " + to_string(currentProcess) + ". Total processes: " + to_string(totalProcesses));
+    Quicksort() {
+        globalGroup = new ProcessGroup(MPI_COMM_WORLD);
+        group = globalGroup;
+        log("Process " + to_string(group->currentProcess) + ". Total processes: " + to_string(group->totalProcesses));
     }
 
     void initialize(IntArray *array) {
-        if (currentProcess == PRIMARY_PROCESS) {
+        if (globalGroup->currentProcess == PRIMARY_PROCESS) {
             MPI_Request request;
-            for (int process = 0; process < totalProcesses; process++) {
-                auto part = array->getPart(process, totalProcesses);
-                MPI_Isend(part->content, part->size, MPI_INT, process, INITIALIZE, MPI_COMM_WORLD, &request);
+            for (int process = 0; process < globalGroup->totalProcesses; process++) {
+                auto part = array->getPart(process, globalGroup->totalProcesses);
+                MPI_Isend(part->content, part->size, MPI_INT, process, 0, MPI_COMM_WORLD, &request);
             }
         }
 
         MPI_Status status;
         int *buffer = new int[MAX_ARRAY_SIZE];
-        MPI_Recv(buffer, MAX_ARRAY_SIZE, MPI_INT, PRIMARY_PROCESS, INITIALIZE, MPI_COMM_WORLD, &status);
+        MPI_Recv(buffer, MAX_ARRAY_SIZE, MPI_INT, PRIMARY_PROCESS, 0, MPI_COMM_WORLD, &status);
 
         int size;
         MPI_Get_count(&status, MPI_INT, &size);
@@ -53,41 +45,34 @@ public:
     }
 
     void pivot() {
-        if (currentProcess == group->master()) {
-            int pivot = currentArray->pivot();
-            MPI_Request request;
-            for (int process = group->first; process <= group->last; process++) {
-                MPI_Isend(&pivot, 1, MPI_INT, process, PIVOT, MPI_COMM_WORLD, &request);
-            }
+        if (group->currentProcess == PRIMARY_PROCESS) {
+            currentPivot = currentArray->pivot();
         }
-
-        MPI_Status status;
-        MPI_Recv(&currentPivot, 1, MPI_INT, group->master(), PIVOT, MPI_COMM_WORLD, &status);
-
+        MPI_Bcast(&currentPivot, 1, MPI_INT, PRIMARY_PROCESS, group->communicator);
         log("New pivot: " + to_string(currentPivot));
     }
 
     void exchange() {
-        int partner = group->partnerFor(currentProcess);
+        int partner = group->getPartner();
 
         IntArray *low, *high;
         currentArray->hoarPartition(currentPivot, &low, &high);
         log("Low = " + low->toString() + "; High = " + high->toString());
 
         MPI_Request request;
-        if (group->isInLeftHalf(currentProcess)) {
-            MPI_Isend(high->content, high->size, MPI_INT, partner, EXCHANGE, MPI_COMM_WORLD, &request);
+        if (group->isInLeftHalf()) {
+            MPI_Isend(high->content, high->size, MPI_INT, partner, 0, group->communicator, &request);
         } else {
-            MPI_Isend(low->content, low->size, MPI_INT, partner, EXCHANGE, MPI_COMM_WORLD, &request);
+            MPI_Isend(low->content, low->size, MPI_INT, partner, 0, group->communicator, &request);
         }
 
         MPI_Status status;
         int *buffer = new int[MAX_ARRAY_SIZE];
-        MPI_Recv(buffer, MAX_ARRAY_SIZE, MPI_INT, partner, EXCHANGE, MPI_COMM_WORLD, &status);
+        MPI_Recv(buffer, MAX_ARRAY_SIZE, MPI_INT, partner, 0, group->communicator, &status);
 
         int size;
         MPI_Get_count(&status, MPI_INT, &size);
-        if (group->isInLeftHalf(currentProcess)) {
+        if (group->isInLeftHalf()) {
             high = new IntArray(buffer, size);
         } else {
             low = new IntArray(buffer, size);
@@ -99,24 +84,10 @@ public:
     }
 
     void regroup() {
-        if (currentProcess == group->master()) {
-            MPI_Request request;
-            for (int process = group->first; process <= group->last; process++) {
-                ProcessGroup *newGroup;
-                if (group->isInLeftHalf(process)) {
-                    newGroup = group->getLeftHalfGroup();
-                } else {
-                    newGroup = group->getRightHalfGroup();
-                }
-                MPI_Isend(serializeGroup(newGroup), 2, MPI_INT, process, REGROUP, MPI_COMM_WORLD, &request);
-            }
-        }
-
-        int *buffer = new int[2];
-        MPI_Status status;
-        MPI_Recv(buffer, 2, MPI_INT, group->master(), REGROUP, MPI_COMM_WORLD, &status);
-        group = deserializeGroup(buffer);
-
+        int newGroup = group->isInLeftHalf() ? 0 : 1;
+        MPI_Comm newCommunicator;
+        MPI_Comm_split(group->communicator, newGroup, 0, &newCommunicator);
+        group = new ProcessGroup(newCommunicator);
         log("New group: " + group->toString());
     }
 
@@ -127,14 +98,14 @@ public:
 
     IntArray *collect() {
         MPI_Request req;
-        MPI_Isend(currentArray->content, currentArray->size, MPI_INT, PRIMARY_PROCESS, COLLECT, MPI_COMM_WORLD, &req);
+        MPI_Isend(currentArray->content, currentArray->size, MPI_INT, PRIMARY_PROCESS, 0, MPI_COMM_WORLD, &req);
 
-        if (currentProcess == PRIMARY_PROCESS) {
+        if (globalGroup->currentProcess == PRIMARY_PROCESS) {
             IntArray *result = nullptr;
-            for (int process = 0; process < totalProcesses; process++) {
+            for (int process = 0; process < globalGroup->totalProcesses; process++) {
                 MPI_Status status;
                 int *buffer = new int[MAX_ARRAY_SIZE];
-                MPI_Recv(buffer, MAX_ARRAY_SIZE, MPI_INT, process, COLLECT, MPI_COMM_WORLD, &status);
+                MPI_Recv(buffer, MAX_ARRAY_SIZE, MPI_INT, process, 0, MPI_COMM_WORLD, &status);
 
                 int size;
                 MPI_Get_count(&status, MPI_INT, &size);
@@ -155,7 +126,9 @@ public:
 
 private:
     void log(const string &message) {
-        ofstream stream("qs." + to_string(currentProcess) + "-" + to_string(totalProcesses) + ".log", ios_base::app);
+        ofstream stream(
+                "qs." + to_string(globalGroup->currentProcess) + "-" + to_string(globalGroup->totalProcesses) + ".log",
+                ios_base::app);
         stream << time(nullptr) << " - " << message << endl;
         stream.close();
     }
