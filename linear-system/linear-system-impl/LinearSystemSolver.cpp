@@ -36,6 +36,8 @@ public:
         MPI_Bcast(&systemSize, 1, MPI_INT, PRIMARY_PROCESS, MPI_COMM_WORLD);
         MPI_Bcast(&precision, 1, MPI_DOUBLE, PRIMARY_PROCESS, MPI_COMM_WORLD);
 
+        log("System size = " + to_string(systemSize) + ", precision = " + to_string(precision));
+
         if (currentProcess != PRIMARY_PROCESS) {
             A = new double[systemSize * systemSize];
             b = new double[systemSize];
@@ -45,6 +47,10 @@ public:
         MPI_Bcast(A, systemSize * systemSize, MPI_DOUBLE, PRIMARY_PROCESS, MPI_COMM_WORLD);
         MPI_Bcast(b, systemSize, MPI_DOUBLE, PRIMARY_PROCESS, MPI_COMM_WORLD);
         MPI_Bcast(x, systemSize, MPI_DOUBLE, PRIMARY_PROCESS, MPI_COMM_WORLD);
+
+        log("A = " + toString(A, systemSize * systemSize) +
+            ", b = " + toString(b, systemSize) +
+            ", x = " + toString(x, systemSize));
 
         if (currentProcess == PRIMARY_PROCESS) {
             const int partSize = systemSize / totalProcesses;
@@ -64,6 +70,8 @@ public:
             MPI_Recv(&offset, 1, MPI_INT, PRIMARY_PROCESS, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
             MPI_Recv(&size, 1, MPI_INT, PRIMARY_PROCESS, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
         }
+
+        log("Offset = " + to_string(offset) + ", size = " + to_string(size));
     }
 
     void computeIteration() {
@@ -142,5 +150,21 @@ private:
             const int size = (process < totalProcesses - 1) ? partSize : systemSize - offset;
             MPI_Bcast(&x[offset], size, MPI_DOUBLE, process, MPI_COMM_WORLD);
         }
+
+        log("x = " + toString(x, systemSize));
+    }
+
+    void log(const string &message) {
+        ofstream stream("ls." + to_string(currentProcess) + "-" + to_string(totalProcesses) + ".log", ios_base::app);
+        stream << time(nullptr) << " - " << message << endl;
+        stream.close();
+    }
+
+    static string toString(double *array, int size) {
+        string repr;
+        for (int i = 0; i < size; i++) {
+            repr.append(to_string(array[i]) + " ");
+        }
+        return repr;
     }
 };
