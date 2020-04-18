@@ -1,46 +1,49 @@
 import csv
 import time
-import random
+import numpy
 import subprocess
 import matplotlib.pyplot as plot
 
-EXECUTABLE = "./linear-system-impl/cmake-build-release/linear-system"
+EXECUTABLE = "./linear-system-impl/cmake-build-release/linear_system"
 
 processes_counts = (1, 2, 4)
-array_lengths = (10_000, 100_000, 500_000, 1_000_000, 3_000_000, 6_000_000, 10_000_000)
+system_sizes = (300, 800, 2000)
+precision = 0.1
 
 benchmarks = {
-    processes_count: {length: -1 for length in array_lengths}
+    processes_count: {size: -1 for size in system_sizes}
     for processes_count in processes_counts
 }
 
 
 def benchmark():
-    for array_length in array_lengths:
-        benchmark_array(array_length)
+    for size in system_sizes:
+        benchmark_system(size)
 
 
-def benchmark_array(array_length):
-    print(f"Benchmarking array of length {array_length}")
-    with open("quicksort.input", "w") as file:
-        array = tuple(str(random.randint(-1_000_000, 1_000_000)) for _ in range(array_length))
-        file.writelines((f"{array_length}\n", " ".join(array)))
+def benchmark_system(system_size):
+    print(f"Benchmarking system of size {system_size}")
+    parameters = numpy.random.rand(system_size + 2, system_size)
+    b = parameters[1]
+    A = parameters[2:]
+    with open("linear-system.input", "w") as file:
+        file.write(f"{system_size} {precision}\n")
+        for row in parameters:
+            file.write(" ".join(str(e) for e in row) + "\n")
     for processes_count in processes_counts:
-        duration = benchmark_array_with_processes_count(processes_count)
-        benchmarks[processes_count][array_length] = duration
-        verify_array_sorted()
+        duration = benchmark_system_with_processes_count(processes_count)
+        benchmarks[processes_count][system_size] = duration
+        verify_system_solved(A, b)
 
 
-def verify_array_sorted():
-    with open("quicksort.output") as file:
-        file.readline()
-        array = tuple(map(int, file.readline().strip().split(" ")))
-        for index in range(len(array) - 1):
-            if array[index] > array[index + 1]:
-                raise Exception("Array was not sorted")
+def verify_system_solved(A, b):
+    x = numpy.fromfile("linear-system.output", sep=" ")
+    correct = all(abs(numpy.dot(A, x) - b) < precision)
+    if not correct:
+        raise Exception("Solution incorrect")
 
 
-def benchmark_array_with_processes_count(processes_count) -> float:
+def benchmark_system_with_processes_count(processes_count) -> float:
     print(f"Benchmarking {processes_count} processes")
     iterations = 100
     start = time.time()
@@ -58,7 +61,7 @@ def plot_results():
     for processes_count in benchmarks:
         durations = tuple(benchmarks[processes_count].values())
         accelerations = tuple(sd / d for sd, d in zip(serial_durations, durations))
-        plot.plot(array_lengths, accelerations, marker='o')
+        plot.plot(system_sizes, accelerations, marker='o')
     plot.legend(processes_counts)
     plot.show()
 
@@ -66,8 +69,8 @@ def plot_results():
 def save_results():
     records = []
     for process_count in benchmarks:
-        for array_length in benchmarks[process_count]:
-            records.append((array_length, process_count, benchmarks[process_count][array_length]))
+        for system_size in benchmarks[process_count]:
+            records.append((system_size, process_count, benchmarks[process_count][system_size]))
     records.sort(key=lambda record: record[0])
     with open("results.csv", "w") as file:
         writer = csv.writer(file)
