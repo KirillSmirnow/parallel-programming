@@ -13,7 +13,7 @@ private:
 
     int systemSize;
     double precision;
-    double **A;       // systemSize x systemSize
+    double *A;        // systemSize x systemSize; A[i][j] = i * systemSize + j
     double *b;        // systemSize
     double *x;        // systemSize
 
@@ -27,10 +27,19 @@ public:
         if (currentProcess == PRIMARY_PROCESS) {
             readParameters();
         }
+
         MPI_Bcast(&systemSize, 1, MPI_INT, PRIMARY_PROCESS, MPI_COMM_WORLD);
         MPI_Bcast(&precision, 1, MPI_DOUBLE, PRIMARY_PROCESS, MPI_COMM_WORLD);
+
+        if (currentProcess != PRIMARY_PROCESS) {
+            A = new double[systemSize * systemSize];
+            b = new double[systemSize];
+            x = new double[systemSize];
+        }
+
         MPI_Bcast(A, systemSize * systemSize, MPI_DOUBLE, PRIMARY_PROCESS, MPI_COMM_WORLD);
         MPI_Bcast(b, systemSize, MPI_DOUBLE, PRIMARY_PROCESS, MPI_COMM_WORLD);
+        MPI_Bcast(x, systemSize, MPI_DOUBLE, PRIMARY_PROCESS, MPI_COMM_WORLD);
     }
 
     void computeIteration() {
@@ -41,6 +50,11 @@ public:
     }
 
     void outputResult() {
+        ofstream stream("linear-system.output");
+        for (auto i = 0; i < systemSize; i++) {
+            stream << x[i] << " ";
+        }
+        stream.close();
     }
 
 private:
@@ -55,11 +69,10 @@ private:
         for (auto i = 0; i < systemSize; i++) {
             stream >> b[i];
         }
-        A = new double *[systemSize];
+        A = new double[systemSize * systemSize];
         for (auto i = 0; i < systemSize; i++) {
-            A[i] = new double[systemSize];
             for (auto j = 0; j < systemSize; j++) {
-                stream >> A[i][j];
+                stream >> A[i * systemSize + j];
             }
         }
         stream.close();
