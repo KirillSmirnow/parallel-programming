@@ -67,6 +67,9 @@ public:
     }
 
     void computeIteration() {
+        saveCurrentXAsPrevious();
+        computeProcessPart();
+        exchangeArrayPartToWholeArray();
     }
 
     bool precisionReached() {
@@ -108,5 +111,36 @@ private:
             }
         }
         stream.close();
+    }
+
+    void saveCurrentXAsPrevious() {
+        if (xPrevious == nullptr) {
+            xPrevious = new double[systemSize];
+        }
+        for (int i = 0; i < systemSize; i++) {
+            xPrevious[i] = x[i];
+        }
+    }
+
+    void computeProcessPart() {
+        for (int i = offset; i < offset + size; i++) {
+            double sum = 0;
+            for (int j = 0; j < systemSize; j++) {
+                if (i != j) {
+                    sum += A[i * systemSize + j] * xPrevious[j];
+                }
+            }
+            x[i] = (b[i] - sum) / A[i * systemSize + i];
+        }
+    }
+
+    void exchangeArrayPartToWholeArray() {
+        MPI_Status status;
+        const int partSize = systemSize / totalProcesses;
+        for (int process = 0; process < totalProcesses; process++) {
+            const int offset = process * partSize;
+            const int size = (process < totalProcesses - 1) ? partSize : systemSize - offset;
+            MPI_Bcast(&x[offset], size, MPI_DOUBLE, process, MPI_COMM_WORLD);
+        }
     }
 };
