@@ -17,7 +17,7 @@ private:
 
     int systemSize;
     double precision;
-    double *A;        // systemSize x systemSize; A[i][j] = i * systemSize + j
+    double *A;        // systemSize x systemSize; element[i][j] = A[i * systemSize + j]
     double *b;        // systemSize
     double *x;        // systemSize
     double *xPrevious = nullptr;   // systemSize
