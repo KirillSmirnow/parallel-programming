@@ -8,7 +8,7 @@ EXECUTABLE = "./linear-system-impl/cmake-build-release/linear_system"
 
 processes_counts = (1, 2, 4)
 system_sizes = (300, 800, 2000)
-precision = 0.1
+precision = 1e-3
 
 benchmarks = {
     processes_count: {size: -1 for size in system_sizes}
@@ -23,9 +23,7 @@ def benchmark():
 
 def benchmark_system(system_size):
     print(f"Benchmarking system of size {system_size}")
-    parameters = numpy.random.rand(system_size + 2, system_size)
-    b = parameters[1]
-    A = parameters[2:]
+    parameters, A, b = create_system(system_size)
     with open("linear-system.input", "w") as file:
         file.write(f"{system_size} {precision}\n")
         for row in parameters:
@@ -34,6 +32,25 @@ def benchmark_system(system_size):
         duration = benchmark_system_with_processes_count(processes_count)
         benchmarks[processes_count][system_size] = duration
         verify_system_solved(A, b)
+
+
+def create_system(size):
+    while True:
+        parameters = numpy.random.rand(size + 2, size)
+        A = parameters[2:]
+
+        # Enforce diagonal
+        A = A + numpy.identity(size) * A * 10000
+
+        E = numpy.eye(size)
+        D = numpy.identity(size) * A
+        B = E - numpy.dot(numpy.linalg.inv(D), A)
+        q = numpy.linalg.norm(B)
+        if q < 0.5:
+            break
+    parameters[2:] = A
+    print(f"q = {q}")
+    return parameters, parameters[2:], parameters[1]
 
 
 def verify_system_solved(A, b):

@@ -12,5 +12,5 @@ int main() {
     solver.outputResult();
 
     MPI_Finalize();
-    return 0;
+    return solver.precisionReached() ? 0 : -1;
 }
