@@ -161,10 +161,22 @@ private:
     }
 
     static string toString(double *array, int size) {
-        string repr;
-        for (int i = 0; i < size; i++) {
-            repr.append(to_string(array[i]) + " ");
+        string contentString;
+        if (size < 20) {
+            for (int i = 0; i < size; i++) {
+                contentString += to_string(array[i]);
+                if (i < size - 1) contentString += " ";
+            }
+        } else {
+            for (int i = 0; i < 5; i++) {
+                contentString += to_string(array[i]) + " ";
+            }
+            contentString += " ... ";
+            for (int i = size - 5; i < size; i++) {
+                contentString += to_string(array[i]);
+                if (i < size - 1) contentString += " ";
+            }
         }
-        return repr;
+        return "|" + to_string(size) + "|[" + contentString + "]";
     }
 };

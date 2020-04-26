@@ -25,7 +25,7 @@ def benchmark_system(system_size):
     print(f"Benchmarking system of size {system_size}")
     parameters, A, b = create_system(system_size)
     with open("linear-system.input", "w") as file:
-        file.write(f"{system_size} {precision}\n")
+        file.write(f"{system_size} {precision / 10}\n")
         for row in parameters:
             file.write(" ".join(str(e) for e in row) + "\n")
     for processes_count in processes_counts:
@@ -40,7 +40,7 @@ def create_system(size):
         A = parameters[2:]
 
         # Enforce diagonal
-        A = A + numpy.identity(size) * A * 10000
+        A = A + numpy.identity(size) * A * 100000
 
         E = numpy.eye(size)
         D = numpy.identity(size) * A
