@@ -7,7 +7,7 @@ import matplotlib.pyplot as plot
 EXECUTABLE = "./linear-system-impl/cmake-build-release/linear_system"
 
 processes_counts = (1, 2, 4)
-system_sizes = (300, 800, 2000)
+system_sizes = tuple(i * 100 for i in range(1, 21))
 precision = 1e-3
 
 benchmarks = {
