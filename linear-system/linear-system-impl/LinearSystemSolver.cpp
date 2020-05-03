@@ -93,11 +93,13 @@ public:
     }
 
     void outputResult() {
-        ofstream stream("linear-system.output");
-        for (auto i = 0; i < systemSize; i++) {
-            stream << x[i] << " ";
+        if (currentProcess == PRIMARY_PROCESS) {
+            ofstream stream("linear-system.output");
+            for (auto i = 0; i < systemSize; i++) {
+                stream << x[i] << " ";
+            }
+            stream.close();
         }
-        stream.close();
     }
 
 private:
