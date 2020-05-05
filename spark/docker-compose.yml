@@ -2,6 +2,7 @@ version: '2'
 
 services:
   master:
+    container_name: spark_master
     image: bitnami/spark:2
     environment:
       - SPARK_MODE=master
