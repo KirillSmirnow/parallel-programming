@@ -1,7 +1,10 @@
 .idea/
 .venv/
 output/
+target/
 cmake-*/
+
+*.iml
 
 *.matrix
 *.log
