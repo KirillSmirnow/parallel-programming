@@ -20,6 +20,13 @@
             <version>2.4.5</version>
             <scope>provided</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.12</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -36,7 +43,7 @@
                         <configuration>
                             <archive>
                                 <manifest>
-                                    <mainClass>nasalogs.NasaLogs</mainClass>
+                                    <mainClass>nasalogs.Main</mainClass>
                                 </manifest>
                             </archive>
                             <descriptorRefs>

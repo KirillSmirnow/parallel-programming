@@ -12,5 +12,5 @@ rm -f app.jar
 
 # Submit app
 docker exec "spark_master" ./bin/spark-submit \
-    --master=spark://master:7077 \
+    --master=spark://spark-master:7077 \
     app.jar
