@@ -1,0 +1,22 @@
+version: '3'
+
+services:
+  namenode:
+    image: uhopper/hadoop-namenode
+    environment:
+      - CLUSTER_NAME=nasa
+    ports:
+      - 50070:50070
+    volumes:
+      - namenode:/hadoop/dfs/name
+
+  datanode1:
+    image: uhopper/hadoop-datanode
+    environment:
+      - CORE_CONF_fs_defaultFS=hdfs://namenode:8020
+    volumes:
+      - datanode1:/hadoop/dfs/data
+
+volumes:
+  namenode:
+  datanode1:
