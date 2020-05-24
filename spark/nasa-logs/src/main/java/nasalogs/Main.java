@@ -18,7 +18,8 @@ public class Main {
     public static final String OUTPUT_DIR = HDFS_ROOT + "/nasa/output_" + now().format(ofPattern("yyyy-MM-dd_HH-mm-ss"));
 
     private static final List<RequestsProcessor> PROCESSORS = asList(
-            new ServerErrorsAggregator()
+            new ServerErrorsAggregator(),
+            new MethodStatusDateCounter()
     );
 
     public static void main(String[] args) {
