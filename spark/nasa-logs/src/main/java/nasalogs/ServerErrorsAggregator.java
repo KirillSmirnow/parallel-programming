@@ -4,7 +4,7 @@ import io.netty.handler.codec.http.HttpStatusClass;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.JavaSparkContext;
 
-import static nasalogs.Main.HDFS_ROOT;
+import static nasalogs.Main.OUTPUT_DIR;
 
 public class ServerErrorsAggregator implements RequestsProcessor {
 
@@ -13,6 +13,6 @@ public class ServerErrorsAggregator implements RequestsProcessor {
         JavaRDD<Request> serverErrors = requests.filter(
                 request -> request.getStatus().codeClass() == HttpStatusClass.SERVER_ERROR
         );
-        serverErrors.saveAsTextFile(HDFS_ROOT + "/nasa/report/2/server-errors");
+        serverErrors.saveAsTextFile(OUTPUT_DIR + "/server-errors");
     }
 }

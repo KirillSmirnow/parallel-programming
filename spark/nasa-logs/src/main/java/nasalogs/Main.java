@@ -7,14 +7,19 @@ import org.apache.spark.api.java.JavaSparkContext;
 
 import java.util.List;
 
+import static java.time.LocalDateTime.now;
+import static java.time.format.DateTimeFormatter.ofPattern;
 import static java.util.Arrays.asList;
 
 public class Main {
 
-    public static final String HDFS_ROOT = "hdfs://hadoop-namenode:8020";
+    private static final String HDFS_ROOT = "hdfs://hadoop-namenode:8020";
+    public static final String INPUT_DIR = HDFS_ROOT + "/nasa/input";
+    public static final String OUTPUT_DIR = HDFS_ROOT + "/nasa/output_" + now().format(ofPattern("yyyy-MM-dd_HH-mm-ss"));
 
-    private static final List<String> LOGS = asList("/nasa/access_log_Jul95", "/nasa/access_log_Aug95");
-    private static final List<RequestsProcessor> PROCESSORS = asList(new ServerErrorsAggregator());
+    private static final List<RequestsProcessor> PROCESSORS = asList(
+            new ServerErrorsAggregator()
+    );
 
     public static void main(String[] args) {
         JavaSparkContext context = new JavaSparkContext(new SparkConf().setAppName("NASA Logs"));
@@ -24,14 +29,11 @@ public class Main {
     }
 
     private static JavaRDD<Request> getRequests(JavaSparkContext context) {
-        JavaRDD<ParsedRequest> parsedRequests = LOGS.stream()
-                .map(log -> context.textFile(HDFS_ROOT + log))
-                .reduce(JavaRDD::union)
-                .orElseGet(context::emptyRDD)
+        JavaRDD<ParsedRequest> parsedRequests = context.textFile(INPUT_DIR)
                 .map(ParsedRequest::of);
         parsedRequests.filter(ParsedRequest::isFailure)
                 .map(ParsedRequest::getEntry)
-                .saveAsTextFile(HDFS_ROOT + "/nasa/report/unparsed-requests");
+                .saveAsTextFile(OUTPUT_DIR + "/unparsed-requests");
         return parsedRequests.filter(ParsedRequest::isSuccess)
                 .map(ParsedRequest::getRequest);
     }
