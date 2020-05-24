@@ -5,8 +5,13 @@ import io.netty.handler.codec.http.HttpResponseStatus;
 import lombok.Value;
 
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.lang.Integer.parseInt;
+import static java.time.format.DateTimeFormatter.ofPattern;
 
 @Value
 public class Request {
@@ -33,18 +38,20 @@ public class Request {
     }
 
     private static LocalDateTime parseDateTime(String dateTime) {
-        return LocalDateTime.now();
+        return OffsetDateTime.parse(dateTime, ofPattern("dd/MMM/yyyy:HH:mm:ss Z"))
+                .withOffsetSameInstant(ZoneOffset.UTC)
+                .toLocalDateTime();
     }
 
     private static HttpMethod parseMethod(String request) {
-        return HttpMethod.GET;
+        return HttpMethod.valueOf(request.split(" ")[0]);
     }
 
     private static HttpResponseStatus parseStatus(String status) {
-        return HttpResponseStatus.OK;
+        return HttpResponseStatus.parseLine(status);
     }
 
     private static int parseResponseSize(String responseSize) {
-        return -1;
+        return responseSize.equals("-") ? -1 : parseInt(responseSize);
     }
 }

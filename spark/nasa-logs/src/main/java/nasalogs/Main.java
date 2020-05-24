@@ -31,7 +31,7 @@ public class Main {
                 .map(ParsedRequest::of);
         parsedRequests.filter(ParsedRequest::isFailure)
                 .map(ParsedRequest::getEntry)
-                .saveAsTextFile(HDFS_ROOT + "/nasa/report/2/unparsed-requests");
+                .saveAsTextFile(HDFS_ROOT + "/nasa/report/unparsed-requests");
         return parsedRequests.filter(ParsedRequest::isSuccess)
                 .map(ParsedRequest::getRequest);
     }
