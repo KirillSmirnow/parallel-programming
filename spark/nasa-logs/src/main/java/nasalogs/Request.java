@@ -10,8 +10,10 @@ import java.time.ZoneOffset;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static io.netty.handler.codec.http.HttpMethod.*;
 import static java.lang.Integer.parseInt;
 import static java.time.format.DateTimeFormatter.ofPattern;
+import static java.util.Arrays.asList;
 
 @Value
 public class Request {
@@ -44,7 +46,11 @@ public class Request {
     }
 
     private static HttpMethod parseMethod(String request) {
-        return HttpMethod.valueOf(request.split(" ")[0]);
+        HttpMethod method = HttpMethod.valueOf(request.split(" ")[0]);
+        if (!asList(GET, POST, PUT, HEAD, CONNECT, DELETE, PATCH, TRACE, OPTIONS).contains(method)) {
+            throw new IllegalArgumentException(String.format("Illegal HTTP method: '%s'", method));
+        }
+        return method;
     }
 
     private static HttpResponseStatus parseStatus(String status) {
