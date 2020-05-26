@@ -19,7 +19,8 @@ public class Main {
 
     private static final List<RequestsProcessor> PROCESSORS = asList(
             new ServerErrorsAggregator(),
-            new MethodStatusDateCounter()
+            new MethodStatusDateCounter(),
+            new DateMethodStatusCounter()
     );
 
     public static void main(String[] args) {
