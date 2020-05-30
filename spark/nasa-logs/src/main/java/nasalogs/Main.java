@@ -20,7 +20,8 @@ public class Main {
     private static final List<RequestsProcessor> PROCESSORS = asList(
             new ServerErrorsAggregator(),
             new MethodStatusDateCounter(),
-            new DateMethodStatusCounter()
+            new DateMethodStatusCounter(),
+            new ErrorsPerWeekReporter()
     );
 
     public static void main(String[] args) {
