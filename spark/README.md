@@ -23,7 +23,7 @@
 методов и статусов" можно решить по-разному в зависимости от желаемого
 представления результатов.
 
-    1. Представление { (method, status, date) → count },
+    1. Представление { (method, status) → (date, count)[] },
     класс `MethodStatusDateCounter`
     ![method-status-date-counts](res/method-status-date-counts.png)
 
@@ -33,3 +33,8 @@
 
 1. Найдём суммарное количество ошибок (коды 4xx и 5xx) по семидневным интервалам
 ![errors-per-week](res/errors-per-week.png)
+
+## Время работы
+![results1](res/results1.png)
+
+На 3-х ядрах / исполнителях удалось достичь ускорения примерно в 2.5 раза.
