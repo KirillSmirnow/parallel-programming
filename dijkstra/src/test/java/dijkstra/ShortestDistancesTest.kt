@@ -16,10 +16,11 @@ class ShortestDistancesTest {
                 intArrayOf(4, -1),
                 intArrayOf(5)
         ))
-        val graph = GraphFactory.create(graphStructure)
         val start = NodeFactory.get(0)
-        val shortestDistances = ShortestDistances(graph, start).find()
-        assertEquals(listOf(0, 4, 1, 5, 7), shortestDistances)
+        GraphFactory.create(graphStructure).forEach { graph ->
+            val shortestDistances = ShortestDistances(graph, start).find()
+            assertEquals(listOf(0, 4, 1, 5, 7), shortestDistances)
+        }
     }
 
     @Test
@@ -30,9 +31,10 @@ class ShortestDistancesTest {
                 intArrayOf(-1, -1),
                 intArrayOf(5)
         ))
-        val graph = GraphFactory.create(graphStructure)
         val start = NodeFactory.get(1)
-        val shortestDistances = ShortestDistances(graph, start).find()
-        assertEquals(listOf(1, 0, 3, null, null), shortestDistances)
+        GraphFactory.create(graphStructure).forEach { graph ->
+            val shortestDistances = ShortestDistances(graph, start).find()
+            assertEquals(listOf(1, 0, 3, null, null), shortestDistances)
+        }
     }
 }
