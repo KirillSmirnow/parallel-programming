@@ -31,4 +31,6 @@ class SequentialGraph(private val graphStructure: GraphStructure) : Graph {
         }
         node.setVisited()
     }
+
+    override fun toString(): String = "Sequential"
 }
