@@ -5,9 +5,9 @@ import dijkstra.graph.GraphStructure
 import dijkstra.graph.Node
 import dijkstra.graph.NodeFactory
 
-class SequentialGraph(private val graphStructure: GraphStructure) : Graph {
+open class SequentialGraph(private val graphStructure: GraphStructure) : Graph {
 
-    private lateinit var nodes: List<Node>
+    protected lateinit var nodes: List<Node>
 
     override fun getDistances(): List<Int?> = nodes.map { it.getDistance() }
 

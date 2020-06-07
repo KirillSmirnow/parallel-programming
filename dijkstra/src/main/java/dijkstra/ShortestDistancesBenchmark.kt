@@ -4,10 +4,11 @@ import dijkstra.graph.*
 import java.time.Duration
 import kotlin.system.measureNanoTime
 
-private val verticesNumbers = listOf(1000)
-private val concurrencyModes = listOf(1, 2, 3, 4)
+private val verticesNumbers = listOf(1000, 5000, 10000, 15000, 20000, 25000)
+private val concurrencyModes = listOf(1, 2, 4)
 
 fun main() {
+    val warmUp = ShortestDistancesBenchmark(2)
     val benchmark = ShortestDistancesBenchmark(10)
     val start = NodeFactory.get(0)
     verticesNumbers.forEach { verticesNumber ->
@@ -15,6 +16,7 @@ fun main() {
         val graphStructure = GraphStructure.random(verticesNumber)
         concurrencyModes.forEach { concurrency ->
             GraphFactory.create(graphStructure, concurrency).forEach { graph ->
+                warmUp.execute(graph, start)
                 val duration = benchmark.execute(graph, start)
                 println(" >> $graph => ${duration.toMillis()} ms")
             }
