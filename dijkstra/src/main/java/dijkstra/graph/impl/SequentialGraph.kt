@@ -5,7 +5,7 @@ import dijkstra.graph.GraphStructure
 import dijkstra.graph.Node
 import dijkstra.graph.NodeFactory
 
-open class SequentialGraph(private val graphStructure: GraphStructure) : Graph {
+open class SequentialGraph(protected val graphStructure: GraphStructure) : Graph {
 
     protected lateinit var nodes: List<Node>
 
