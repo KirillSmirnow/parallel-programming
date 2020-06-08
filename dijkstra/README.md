@@ -25,3 +25,7 @@
 Паттерн fork-join реализуется при параллельном режиме работы объекта Stream.
 
 [ThreadPool for Parallel Streams](https://www.baeldung.com/java-8-parallel-streams-custom-threadpool)
+
+## Результаты измерений
+![duration](res/duration.svg)
+![speedup](res/speedup.svg)
