@@ -28,6 +28,13 @@ public:
         MPI_Comm_size(MPI_COMM_WORLD, &totalProcesses);
     }
 
+    ~LinearSystemSolver() {
+        delete[] A;
+        delete[] b;
+        delete[] x;
+        delete[] xPrevious;
+    }
+
     void initialize() {
         if (currentProcess == PRIMARY_PROCESS) {
             readParameters();
