@@ -42,22 +42,12 @@ public:
 
         MPI_Bcast(&systemSize, 1, MPI_INT, PRIMARY_PROCESS, MPI_COMM_WORLD);
         MPI_Bcast(&precision, 1, MPI_DOUBLE, PRIMARY_PROCESS, MPI_COMM_WORLD);
-
         log("System size = " + to_string(systemSize) + ", precision = " + to_string(precision));
 
         if (currentProcess != PRIMARY_PROCESS) {
-            A = new double[systemSize * systemSize];
-            b = new double[systemSize];
             x = new double[systemSize];
         }
-
-        MPI_Bcast(A, systemSize * systemSize, MPI_DOUBLE, PRIMARY_PROCESS, MPI_COMM_WORLD);
-        MPI_Bcast(b, systemSize, MPI_DOUBLE, PRIMARY_PROCESS, MPI_COMM_WORLD);
         MPI_Bcast(x, systemSize, MPI_DOUBLE, PRIMARY_PROCESS, MPI_COMM_WORLD);
-
-        log("A = " + toString(A, systemSize * systemSize) +
-            ", b = " + toString(b, systemSize) +
-            ", x = " + toString(x, systemSize));
 
         if (currentProcess == PRIMARY_PROCESS) {
             const int partSize = systemSize / totalProcesses;
@@ -70,15 +60,28 @@ public:
                 } else {
                     MPI_Send(&offset, 1, MPI_INT, process, 0, MPI_COMM_WORLD);
                     MPI_Send(&size, 1, MPI_INT, process, 0, MPI_COMM_WORLD);
+
+                    MPI_Send(&A[offset * systemSize], size * systemSize, MPI_DOUBLE, process, 0, MPI_COMM_WORLD);
+                    MPI_Send(&b[offset], size, MPI_DOUBLE, process, 0, MPI_COMM_WORLD);
                 }
             }
         } else {
             MPI_Status status;
             MPI_Recv(&offset, 1, MPI_INT, PRIMARY_PROCESS, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
             MPI_Recv(&size, 1, MPI_INT, PRIMARY_PROCESS, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+
+            A = new double[size * systemSize];
+            MPI_Recv(A, size * systemSize, MPI_DOUBLE, PRIMARY_PROCESS, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
+
+            b = new double[size];
+            MPI_Recv(b, size, MPI_DOUBLE, PRIMARY_PROCESS, MPI_ANY_TAG, MPI_COMM_WORLD, &status);
         }
 
         log("Offset = " + to_string(offset) + ", size = " + to_string(size));
+
+        log("A = " + toString(A, size * systemSize) +
+            ", b = " + toString(b, size) +
+            ", x = " + toString(x, systemSize));
     }
 
     void computeIteration() {
@@ -144,10 +147,10 @@ private:
             double sum = 0;
             for (int j = 0; j < systemSize; j++) {
                 if (i != j) {
-                    sum += A[i * systemSize + j] * xPrevious[j];
+                    sum += A[(i - offset) * systemSize + j] * xPrevious[j];
                 }
             }
-            x[i] = (b[i] - sum) / A[i * systemSize + i];
+            x[i] = (b[i - offset] - sum) / A[(i - offset) * systemSize + i];
         }
     }
 
