@@ -50,10 +50,9 @@ public:
         MPI_Bcast(x, systemSize, MPI_DOUBLE, PRIMARY_PROCESS, MPI_COMM_WORLD);
 
         if (currentProcess == PRIMARY_PROCESS) {
-            const int partSize = systemSize / totalProcesses;
+            int offset = 0;
             for (int process = 0; process < totalProcesses; process++) {
-                int offset = process * partSize;
-                int size = (process < totalProcesses - 1) ? partSize : systemSize - offset;
+                int size = systemSize / totalProcesses + (systemSize % totalProcesses > process);
                 if (process == PRIMARY_PROCESS) {
                     this->offset = offset;
                     this->size = size;
@@ -64,6 +63,7 @@ public:
                     MPI_Send(&A[offset * systemSize], size * systemSize, MPI_DOUBLE, process, 0, MPI_COMM_WORLD);
                     MPI_Send(&b[offset], size, MPI_DOUBLE, process, 0, MPI_COMM_WORLD);
                 }
+                offset += size;
             }
         } else {
             MPI_Status status;
